@@ -67,13 +67,18 @@
                 </div>
             </div>
 
-            <!-- Status Pajak PTKP -->
+            <!-- Status Pajak PTKP Detail -->
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Status Pajak (PTKP)</label>
-                <select id="statusPajak" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                    <option value="A">TK/0, TK/1, K/0 (Kategori A)</option>
-                    <option value="B">TK/2, TK/3, K/1, K/2 (Kategori B)</option>
-                    <option value="C">K/3 (Kategori C)</option>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Status PTKP (Pajak)</label>
+                <select id="ptkpSelect" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="54000000">TK/0 - Tidak Kawin (Rp 54.000.000)</option>
+                    <option value="58500000">TK/1 - Tidak Kawin, 1 Tanggungan (Rp 58.500.000)</option>
+                    <option value="63000000">TK/2 - Tidak Kawin, 2 Tanggungan (Rp 63.000.000)</option>
+                    <option value="67500000">TK/3 - Tidak Kawin, 3 Tanggungan (Rp 67.500.000)</option>
+                    <option value="58500000_K">K/0 - Kawin, 0 Tanggungan (Rp 58.500.000)</option>
+                    <option value="63000000_K">K/1 - Kawin, 1 Tanggungan (Rp 63.000.000)</option>
+                    <option value="67500000_K">K/2 - Kawin, 2 Tanggungan (Rp 67.500.000)</option>
+                    <option value="72000000">K/3 - Kawin, 3 Tanggungan (Rp 72.000.000)</option>
                 </select>
             </div>
 
@@ -120,139 +125,59 @@
             return workdaysMissed;
         }
 
-        // Logika TER PPh 21 (PP 58/2023)
-        function getPersentasePPh21(kategori, bruto) {
-            if (kategori === 'A') {
-                if (bruto <= 5400000) return 0;
-                if (bruto <= 5650000) return 0.0025;
-                if (bruto <= 5950000) return 0.005;
-                if (bruto <= 6300000) return 0.0075;
-                if (bruto <= 6750000) return 0.01;
-                if (bruto <= 7500000) return 0.0125;
-                if (bruto <= 8550000) return 0.015;
-                if (bruto <= 9650000) return 0.0175;
-                if (bruto <= 10050000) return 0.02;
-                if (bruto <= 10350000) return 0.0225;
-                if (bruto <= 10700000) return 0.025;
-                if (bruto <= 11050000) return 0.03;
-                if (bruto <= 11600000) return 0.035;
-                if (bruto <= 12500000) return 0.04;
-                if (bruto <= 13750000) return 0.05;
-                if (bruto <= 15100000) return 0.06;
-                if (bruto <= 16950000) return 0.07;
-                if (bruto <= 19750000) return 0.08;
-                if (bruto <= 24150000) return 0.09;
-                if (bruto <= 26450000) return 0.10;
-                if (bruto <= 28000000) return 0.11;
-                if (bruto <= 30050000) return 0.12;
-                if (bruto <= 32400000) return 0.13;
-                if (bruto <= 35400000) return 0.14;
-                if (bruto <= 39100000) return 0.15;
-                if (bruto <= 43850000) return 0.16;
-                if (bruto <= 47800000) return 0.17;
-                if (bruto <= 51400000) return 0.18;
-                if (bruto <= 56300000) return 0.19;
-                if (bruto <= 62200000) return 0.20;
-                if (bruto <= 68600000) return 0.21;
-                if (bruto <= 77500000) return 0.22;
-                if (bruto <= 89000000) return 0.23;
-                if (bruto <= 103000000) return 0.24;
-                if (bruto <= 125000000) return 0.25;
-                if (bruto <= 157000000) return 0.26;
-                if (bruto <= 206000000) return 0.27;
-                if (bruto <= 337000000) return 0.28;
-                if (bruto <= 454000000) return 0.29;
-                if (bruto <= 550000000) return 0.30;
-                if (bruto <= 695000000) return 0.31;
-                if (bruto <= 910000000) return 0.32;
-                if (bruto <= 1400000000) return 0.33;
-                return 0.34;
+        // Kalkulasi PPh 21 Metode Pasal 17 UU PPh (Disetahunkan - Konsultan Pajak Method)
+        function hitungPPh21Pasal17(brutoBulananPajak, iuranJhtKaryawan, iuranJpKaryawan, nominalPTKP) {
+            // 1. Biaya Jabatan (5% dari Bruto Pajak, maks Rp 500.000/bulan)
+            const biayaJabatan = Math.min(brutoBulananPajak * 0.05, 500000);
 
-            } else if (kategori === 'B') {
-                if (bruto <= 6200000) return 0;
-                if (bruto <= 6500000) return 0.0025;
-                if (bruto <= 6850000) return 0.005;
-                if (bruto <= 7300000) return 0.0075;
-                if (bruto <= 9200000) return 0.01;
-                if (bruto <= 10750000) return 0.015;
-                if (bruto <= 11250000) return 0.02;
-                if (bruto <= 11650000) return 0.025;
-                if (bruto <= 12600000) return 0.03;
-                if (bruto <= 13600000) return 0.04;
-                if (bruto <= 14950000) return 0.05;
-                if (bruto <= 16400000) return 0.06;
-                if (bruto <= 18450000) return 0.07;
-                if (bruto <= 21850000) return 0.08;
-                if (bruto <= 26000000) return 0.09;
-                if (bruto <= 28600000) return 0.10;
-                if (bruto <= 30400000) return 0.11;
-                if (bruto <= 32550000) return 0.12;
-                if (bruto <= 35100000) return 0.13;
-                if (bruto <= 38300000) return 0.14;
-                if (bruto <= 42300000) return 0.15;
-                if (bruto <= 47300000) return 0.16;
-                if (bruto <= 51700000) return 0.17;
-                if (bruto <= 55600000) return 0.18;
-                if (bruto <= 60900000) return 0.19;
-                if (bruto <= 67300000) return 0.20;
-                if (bruto <= 74200000) return 0.21;
-                if (bruto <= 83800000) return 0.22;
-                if (bruto <= 96200000) return 0.23;
-                if (bruto <= 111300000) return 0.24;
-                if (bruto <= 135100000) return 0.25;
-                if (bruto <= 169800000) return 0.26;
-                if (bruto <= 222900000) return 0.27;
-                if (bruto <= 364600000) return 0.28;
-                if (bruto <= 491200000) return 0.29;
-                if (bruto <= 595500000) return 0.30;
-                if (bruto <= 752200000) return 0.31;
-                if (bruto <= 984800000) return 0.32;
-                if (bruto <= 1515200000) return 0.33;
-                return 0.34;
+            // 2. Penghasilan Neto Bulanan
+            const netoBulanan = brutoBulananPajak - biayaJabatan - iuranJhtKaryawan - iuranJpKaryawan;
 
-            } else { // Kategori C
-                if (bruto <= 6600000) return 0;
-                if (bruto <= 6950000) return 0.0025;
-                if (bruto <= 7350000) return 0.005;
-                if (bruto <= 7800000) return 0.0075;
-                if (bruto <= 8850000) return 0.01;
-                if (bruto <= 9800000) return 0.0125;
-                if (bruto <= 10950000) return 0.015;
-                if (bruto <= 11450000) return 0.02;
-                if (bruto <= 11950000) return 0.025;
-                if (bruto <= 12900000) return 0.03;
-                if (bruto <= 13950000) return 0.04;
-                if (bruto <= 15350000) return 0.05;
-                if (bruto <= 16850000) return 0.06;
-                if (bruto <= 18950000) return 0.07;
-                if (bruto <= 22450000) return 0.08;
-                if (bruto <= 26700000) return 0.09;
-                if (bruto <= 29350000) return 0.10;
-                if (bruto <= 31250000) return 0.11;
-                if (bruto <= 33450000) return 0.12;
-                if (bruto <= 36050000) return 0.13;
-                if (bruto <= 39350000) return 0.14;
-                if (bruto <= 43450000) return 0.15;
-                if (bruto <= 48600000) return 0.16;
-                if (bruto <= 53100000) return 0.17;
-                if (bruto <= 57100000) return 0.18;
-                if (bruto <= 62550000) return 0.19;
-                if (bruto <= 69150000) return 0.20;
-                if (bruto <= 76250000) return 0.21;
-                if (bruto <= 86150000) return 0.22;
-                if (bruto <= 98900000) return 0.23;
-                if (bruto <= 114400000) return 0.24;
-                if (bruto <= 138850000) return 0.25;
-                if (bruto <= 174550000) return 0.26;
-                if (bruto <= 229150000) return 0.27;
-                if (bruto <= 374850000) return 0.28;
-                if (bruto <= 505050000) return 0.29;
-                if (bruto <= 612300000) return 0.30;
-                if (bruto <= 773450000) return 0.31;
-                if (bruto <= 1012600000) return 0.32;
-                if (bruto <= 1557950000) return 0.33;
-                return 0.34;
+            // 3. Penghasilan Neto Setahun
+            const netoSetahun = netoBulanan * 12;
+
+            // 4. Penghasilan Kena Pajak (PKP) Setahun
+            let pkpSetahun = netoSetahun - nominalPTKP;
+            if (pkpSetahun <= 0) return 0;
+
+            // Pembulatan ke bawah per ribuan penuh
+            pkpSetahun = Math.floor(pkpSetahun / 1000) * 1000;
+
+            // 5. Perhitungan Pajak Progresif Pasal 17
+            let pajakSetahun = 0;
+            let sisaPKP = pkpSetahun;
+
+            // Lapis 1: 5% (0 - 60 Juta)
+            if (sisaPKP > 0) {
+                const layer1 = Math.min(sisaPKP, 60000000);
+                pajakSetahun += layer1 * 0.05;
+                sisaPKP -= layer1;
             }
+            // Lapis 2: 15% (60 Juta - 250 Juta)
+            if (sisaPKP > 0) {
+                const layer2 = Math.min(sisaPKP, 190000000);
+                pajakSetahun += layer2 * 0.15;
+                sisaPKP -= layer2;
+            }
+            // Lapis 3: 25% (250 Juta - 500 Juta)
+            if (sisaPKP > 0) {
+                const layer3 = Math.min(sisaPKP, 250000000);
+                pajakSetahun += layer3 * 0.25;
+                sisaPKP -= layer3;
+            }
+            // Lapis 4: 30% (500 Juta - 5 Miliar)
+            if (sisaPKP > 0) {
+                const layer4 = Math.min(sisaPKP, 4500000000);
+                pajakSetahun += layer4 * 0.30;
+                sisaPKP -= layer4;
+            }
+            // Lapis 5: 35% (Di atas 5 Miliar)
+            if (sisaPKP > 0) {
+                pajakSetahun += sisaPKP * 0.35;
+            }
+
+            // 6. PPh 21 Bulanan
+            return pajakSetahun / 12;
         }
 
         document.getElementById('payrollForm').addEventListener('submit', function(e) {
@@ -267,7 +192,10 @@
             const gapokNominal = parseNominal(document.getElementById('gajiPokok').value);
             const tunjBensin = parseNominal(document.getElementById('tunjBensin').value); 
             const tunjKendaraan = parseNominal(document.getElementById('tunjKendaraan').value); 
-            const statusPajak = document.getElementById('statusPajak').value;
+            
+            const ptkpValueRaw = document.getElementById('ptkpSelect').value;
+            const nominalPTKP = parseFloat(ptkpValueRaw.replace('_K', ''));
+            const textPTKP = document.getElementById('ptkpSelect').options[document.getElementById('ptkpSelect').selectedIndex].text.split(' - ')[0];
 
             // 2. Kalkulasi Prorate Berdasarkan Join Date
             const baseHariKerja = 21;
@@ -287,47 +215,49 @@
             let bpjsJhtYayasan = 0, bpjsJpYayasan = 0, bpjsJkkYayasan = 0, bpjsJkYayasan = 0;
 
             if (statusKaryawan === 'tetap') {
-                // BPJS Kesehatan (Semua Pekerja Tetap)
+                // BPJS Kesehatan (Cap Rp 12.000.000)
                 const capBPJSKes = Math.min(gapokNominal, 12000000);
                 bpjsKesKaryawan = capBPJSKes * 0.01;
                 bpjsKesYayasan = capBPJSKes * 0.04;
 
-                // BPJS TK - JHT (Semua Pekerja Tetap)
+                // BPJS TK - JHT
                 bpjsJhtKaryawan = gapokNominal * 0.02;
                 bpjsJhtYayasan = gapokNominal * 0.037;
 
-                // BPJS TK - JP (HANYA UNTUK WNI)
+                // BPJS TK - JP (HANYA UNTUK WNI, Cap Rp 10.042.300)
                 if (kewarganegaraan === 'WNI') {
                     const capJP = Math.min(gapokNominal, 10042300);
                     bpjsJpKaryawan = capJP * 0.01;
                     bpjsJpYayasan = capJP * 0.02;
                 } else {
-                    // WNA Tidak Dipotong JP
                     bpjsJpKaryawan = 0;
                     bpjsJpYayasan = 0;
                 }
 
                 // JKK & JK (Diampu Yayasan)
                 bpjsJkkYayasan = gapokNominal * 0.0024;
-                bpjsJkYayasan = gapokNominal * 0.003;
+                bpjsJkYayasan = gapokNominal * 0.03; // 0.3%
             }
 
             const totalBpjsTkKaryawan = bpjsJhtKaryawan + bpjsJpKaryawan;
 
-            // 4. Penghasilan Bruto & PPh 21
-            const totalPenghasilanBruto = gapokDiterima + tunjBensinDiterima + tunjKendaraanDiterima;
-            let pph21 = 0;
+            // 4. Perhitungan Penghasilan Bruto & PPh 21 (Pasal 17 Disetahunkan)
+            const brutoKas = gapokDiterima + tunjBensinDiterima + tunjKendaraanDiterima;
+            
+            // Tunjangan BPJS Porsi Yayasan yang Menjadi Objek Pajak (BPJS Kes 4%, JKK 0.24%, JK 0.3%)
+            const bpjsYayasanObjekPajak = bpjsKesYayasan + bpjsJkkYayasan + bpjsJkYayasan;
+            const brutoPajak = brutoKas + bpjsYayasanObjekPajak;
 
+            let pph21 = 0;
             if (statusKaryawan === 'tetap') {
-                const tarifTER = getPersentasePPh21(statusPajak, totalPenghasilanBruto);
-                pph21 = totalPenghasilanBruto * tarifTER;
+                pph21 = hitungPPh21Pasal17(brutoPajak, bpjsJhtKaryawan, bpjsJpKaryawan, nominalPTKP);
             } else {
-                pph21 = (totalPenghasilanBruto * 0.5) * 0.05;
+                pph21 = (brutoKas * 0.5) * 0.05;
             }
 
             // 5. Take Home Pay (THP)
             const totalPotonganKaryawan = bpjsKesKaryawan + totalBpjsTkKaryawan + pph21;
-            const takeHomePay = totalPenghasilanBruto - totalPotonganKaryawan;
+            const takeHomePay = brutoKas - totalPotonganKaryawan;
 
             // Format Tanggal Indonesia
             const formattedJoinDate = new Date(joinDateInput).toLocaleDateString('id-ID', {
@@ -353,8 +283,9 @@
             doc.text(`Status Karyawan: ${statusKaryawan === 'tetap' ? 'Pekerja Tetap' : 'Pekerja Tidak Tetap'}`, 14, 35);
             doc.text(`Tanggal Masuk  : ${formattedJoinDate}`, 14, 40);
             
-            doc.text(`Kategori PTKP  : Kategori ${statusPajak}`, 125, 30);
-            doc.text(`Prorate Base   : ${hariBekerjaEfektif} / 21 Hari (Pengurang: ${hariAbsenSebelumJoin} Hari)`, 125, 35);
+            doc.text(`Status PTKP    : ${textPTKP}`, 125, 30);
+            doc.text(`Metode Pajak   : Pasal 17 Disetahunkan`, 125, 35);
+            doc.text(`Prorate Base   : ${hariBekerjaEfektif} / 21 Hari (Pengurang: ${hariAbsenSebelumJoin} Hari)`, 125, 40);
 
             // Label JP pada PDF menyesuaikan WNI/WNA
             const labelJP = kewarganegaraan === 'WNA' ? 'BPJS TK - JP (Exempt WNA)' : 'BPJS TK - JP (1%)';
@@ -367,10 +298,10 @@
                     ['Gaji Pokok (Prorate)', Math.round(gapokDiterima).toLocaleString('id-ID'), 'BPJS Kesehatan (1%)', Math.round(bpjsKesKaryawan).toLocaleString('id-ID')],
                     ['Tunjangan Bensin', Math.round(tunjBensinDiterima).toLocaleString('id-ID'), 'BPJS TK - JHT (2%)', Math.round(bpjsJhtKaryawan).toLocaleString('id-ID')],
                     ['Tunjangan Kendaraan', Math.round(tunjKendaraanDiterima).toLocaleString('id-ID'), labelJP, Math.round(bpjsJpKaryawan).toLocaleString('id-ID')],
-                    ['', '', 'PPh 21', Math.round(pph21).toLocaleString('id-ID')],
+                    ['', '', 'PPh 21 (Pasal 17)', Math.round(pph21).toLocaleString('id-ID')],
                 ],
                 foot: [[
-                    'Total Bruto', Math.round(totalPenghasilanBruto).toLocaleString('id-ID'),
+                    'Total Bruto Kas', Math.round(brutoKas).toLocaleString('id-ID'),
                     'Total Potongan', Math.round(totalPotonganKaryawan).toLocaleString('id-ID')
                 ]],
                 theme: 'striped',
