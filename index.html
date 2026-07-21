@@ -1,1 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll System - Yayasan Black Licorice Indonesia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF & AutoTable CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-slate-100 p-6 font-sans">
 
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md border border-slate-200">
+        <h1 class="text-2xl font-bold text-slate-800 mb-1">Payroll System</h1>
+        <p class="text-slate-500 font-medium mb-6">Yayasan Black Licorice Indonesia</p>
+
+        <form id="payrollForm" class="space-y-4">
+            <!-- Informasi Karyawan -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Karyawan</label>
+                    <input type="text" id="nama" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Status Karyawan</label>
+                    <select id="statusKaryawan" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="tetap">Pekerja Tetap (PKWT / PKWTT)</option>
+                        <option value="tidak_tetap">Pekerja Tidak Tetap (Konsultan / Freelance)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Absensi -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jumlah Hari Kerja Seharusnya</label>
+                    <input type="number" id="hariSeharusnya" value="22" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Jumlah Hari Kerja Hadir</label>
+                    <input type="number" id="hariHadir" value="22" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            </div>
+
+            <!-- Penghasilan -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Gaji Pokok (Rp)</label>
+                    <input type="number" id="gajiPokok" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tunjangan Bensin (Rp)</label>
+                    <input type="number" id="tunjBensin" value="0" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tunjangan Kendaraan (Rp)</label>
+                    <input type="number" id="tunjKendaraan" value="0" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+            </div>
+
+            <!-- Status Pajak PTKP -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Status Pajak (PTKP)</label>
+                <select id="statusPajak" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="A">TK/0, TK/1, K/0 (Kategori A)</option>
+                    <option value="B">TK/2, TK/3, K/1, K/2 (Kategori B)</option>
+                    <option value="C">K/3 (Kategori C)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition duration-200 mt-6">
+                Hitung & Cetak Slip Gaji (PDF)
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Logika TER PPh 21 Sederhana (Kategori A, B, C berdasarkan PP 58/2023 / Aturan Berlaku)
+        function getPersentasePPh21(kategori, bruto) {
+            if (kategori === 'A') {
+                if (bruto <= 5400000) return 0;
+                if (bruto <= 5650000) return 0.0025;
+                if (bruto <= 5950000) return 0.005;
+                if (bruto <= 6300000) return 0.0075;
+                if (bruto <= 6750000) return 0.01;
+                if (bruto <= 7500000) return 0.0125;
+                if (bruto <= 8550000) return 0.015;
+                if (bruto <= 9650000) return 0.0175;
+                if (bruto <= 10050000) return 0.02;
+                if (bruto <= 10350000) return 0.0225;
+                return 0.03; // Batas contoh sederhana, bisa diperluas
+            } else if (kategori === 'B') {
+                if (bruto <= 6200000) return 0;
+                if (bruto <= 6500000) return 0.0025;
+                if (bruto <= 6850000) return 0.005;
+                if (bruto <= 7300000) return 0.0075;
+                if (bruto <= 9200000) return 0.01;
+                if (bruto <= 10750000) return 0.015;
+                return 0.02;
+            } else { // Kategori C
+                if (bruto <= 6600000) return 0;
+                if (bruto <= 6950000) return 0.0025;
+                if (bruto <= 7350000) return 0.005;
+                if (bruto <= 7800000) return 0.0075;
+                if (bruto <= 8850000) return 0.01;
+                if (bruto <= 9800000) return 0.0125;
+                return 0.015;
+            }
+        }
+
+        document.getElementById('payrollForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // 1. Ambil Nilai Input
+            const nama = document.getElementById('nama').value;
+            const statusKaryawan = document.getElementById('statusKaryawan').value;
+            const hariSeharusnya = parseFloat(document.getElementById('hariSeharusnya').value) || 1;
+            const hariHadir = parseFloat(document.getElementById('hariHadir').value) || 0;
+            const gapokNominal = parseFloat(document.getElementById('gajiPokok').value) || 0;
+            const tunjBensin = parseFloat(document.getElementById('tunjBensin').value) || 0;
+            const tunjKendaraan = parseFloat(document.getElementById('tunjKendaraan').value) || 0;
+            const statusPajak = document.getElementById('statusPajak').value;
+
+            // 2. Perhitungan Prorate Gaji Pokok & Tunjangan Berdasarkan Absensi
+            const rasioHadir = Math.min(hariHadir / hariSeharusnya, 1);
+            const gapokDiterima = gapokNominal * rasioHadir;
+            const tunjBensinDiterima = tunjBensin * rasioHadir;
+            const tunjKendaraanDiterima = tunjKendaraan * rasioHadir;
+
+            // 3. Perhitungan BPJS (Mengacu pada Gaji Pokok Kontrak/Nominal)
+            let bpjsKesKaryawan = 0, bpjsKesYayasan = 0;
+            let bpjsTkKaryawan = 0, bpjsTkYayasan = 0;
+
+            if (statusKaryawan === 'tetap') {
+                // BPJS Kesehatan (1% Karyawan, 4% Yayasan) - Maks Cap Rp 12.000.000
+                const capBPJSKes = Math.min(gapokNominal, 12000000);
+                bpjsKesKaryawan = capBPJSKes * 0.01;
+                bpjsKesYayasan = capBPJSKes * 0.04;
+
+                // BPJS TK Karyawan: JHT (2%) + JP (1% maks cap Rp 10.042.300) = ~3%
+                const capJP = Math.min(gapokNominal, 10042300);
+                bpjsTkKaryawan = (gapokNominal * 0.02) + (capJP * 0.01);
+
+                // BPJS TK Yayasan: JHT (3.7%) + JKK (0.24%) + JK (0.3%) + JP (2%)
+                bpjsTkYayasan = (gapokNominal * 0.037) + (gapokNominal * 0.0024) + (gapokNominal * 0.003) + (capJP * 0.02);
+            }
+
+            // 4. Perhitungan Penghasilan Bruto & PPh 21
+            const totalPenghasilanBruto = gapokDiterima + tunjBensinDiterima + tunjKendaraanDiterima;
+            let pph21 = 0;
+
+            if (statusKaryawan === 'tetap') {
+                // Menggunakan Skema TER 2024/2026
+                const tarifTER = getPersentasePPh21(statusPajak, totalPenghasilanBruto);
+                pph21 = totalPenghasilanBruto * tarifTER;
+            } else {
+                // Freelance / Konsultan: PPh 21 Non-Pegawai (50% x Bruto x Tarif Pasat 17)
+                // Asumsi dasar bracket pertama 5%
+                pph21 = (totalPenghasilanBruto * 0.5) * 0.05;
+            }
+
+            // 5. Take Home Pay (THP)
+            const totalPotonganKaryawan = bpjsKesKaryawan + bpjsTkKaryawan + pph21;
+            const takeHomePay = totalPenghasilanBruto - totalPotonganKaryawan;
+
+            // 6. Generate PDF via jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Header PDF
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text("YAYASAN BLACK LICORICE INDONESIA", 105, 15, { align: "center" });
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "normal");
+            doc.text("SLIP GAJI KARYAWAN", 105, 22, { align: "center" });
+            doc.line(14, 25, 196, 25);
+
+            // Detail Karyawan
+            doc.setFontSize(9);
+            doc.text(`Nama Karyawan  : ${nama}`, 14, 32);
+            doc.text(`Status Karyawan: ${statusKaryawan === 'tetap' ? 'Pekerja Tetap' : 'Pekerja Tidak Tetap'}`, 14, 37);
+            doc.text(`Kehadiran       : ${hariHadir} / ${hariSeharusnya} Hari`, 14, 42);
+            doc.text(`Kategori PTKP  : Kategori ${statusPajak}`, 130, 32);
+
+            // Tabel Penerimaan & Potongan Karyawan
+            doc.autoTable({
+                startY: 48,
+                head: [['Penerimaan', 'Jumlah (Rp)', 'Potongan Karyawan', 'Jumlah (Rp)']],
+                body: [
+                    ['Gaji Pokok (Prorate)', Math.round(gapokDiterima).toLocaleString('id-ID'), 'BPJS Kesehatan (1%)', Math.round(bpjsKesKaryawan).toLocaleString('id-ID')],
+                    ['Tunjangan Bensin', Math.round(tunjBensinDiterima).toLocaleString('id-ID'), 'BPJS TK (JHT+JP)', Math.round(bpjsTkKaryawan).toLocaleString('id-ID')],
+                    ['Tunjangan Kendaraan', Math.round(tunjKendaraanDiterima).toLocaleString('id-ID'), 'PPh 21', Math.round(pph21).toLocaleString('id-ID')],
+                ],
+                foot: [[
+                    'Total Bruto', Math.round(totalPenghasilanBruto).toLocaleString('id-ID'),
+                    'Total Potongan', Math.round(totalPotonganKaryawan).toLocaleString('id-ID')
+                ]],
+                theme: 'striped',
+                headStyles: { fillColor: [41, 128, 185] }
+            });
+
+            // Tabel Tunjangan/Benefit BPJS Porsi Yayasan
+            const finalY = doc.lastAutoTable.finalY + 8;
+            doc.setFont("helvetica", "bold");
+            doc.text("Tanggungan / Benefit BPJS Porsi Yayasan (Tidak Memotong Gaji)", 14, finalY);
+
+            doc.autoTable({
+                startY: finalY + 3,
+                head: [['Komponen Benefit Yayasan', 'Persentase', 'Jumlah Tanggungan (Rp)']],
+                body: [
+                    ['BPJS Kesehatan (Porsi Yayasan)', '4%', Math.round(bpjsKesYayasan).toLocaleString('id-ID')],
+                    ['BPJS Ketenagakerjaan (Porsi Yayasan)', 'JKK, JK, JHT, JP', Math.round(bpjsTkYayasan).toLocaleString('id-ID')],
+                ],
+                theme: 'plain',
+                styles: { fontSize: 8 }
+            });
+
+            // Highlight Take Home Pay
+            const thpY = doc.lastAutoTable.finalY + 12;
+            doc.setFillColor(235, 248, 255);
+            doc.rect(14, thpY, 182, 12, 'F');
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 51, 102);
+            doc.text(`TAKE HOME PAY (THP):  Rp ${Math.round(takeHomePay).toLocaleString('id-ID')}`, 18, thpY + 8);
+
+            // Footer Tanda Tangan
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            doc.text("Disetujui Oleh,", 150, thpY + 25);
+            doc.text("Yayasan Black Licorice Indonesia", 130, thpY + 45);
+
+            // Save PDF
+            doc.save(`Slip_Gaji_${nama.replace(/\s+/g, '_')}.pdf`);
+        });
+    </script>
+</body>
+</html>
