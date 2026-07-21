@@ -17,11 +17,18 @@
         <p class="text-slate-500 font-medium mb-6">Yayasan Black Licorice Indonesia</p>
 
         <form id="payrollForm" class="space-y-4">
-            <!-- Informasi Karyawan -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Informasi Karyawan & Kewarganegaraan -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Karyawan</label>
                     <input type="text" id="nama" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Kewarganegaraan</label>
+                    <select id="kewarganegaraan" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="WNI">WNI (Warga Negara Indonesia)</option>
+                        <option value="WNA">WNA (Warga Negara Asing)</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Status Karyawan</label>
@@ -94,7 +101,7 @@
             return parseFloat(valueStr.replace(/\./g, '')) || 0;
         }
 
-        // Fungsi Menghitung Hari Kerja (Senin-Jumat) dari Tgl 1 s.d. sebelum Join Date
+        // Menghitung Hari Kerja (Senin-Jumat) dari Tgl 1 s.d. sebelum Join Date
         function countWorkdaysBeforeJoin(joinDateStr) {
             const joinDate = new Date(joinDateStr);
             const year = joinDate.getFullYear();
@@ -103,11 +110,9 @@
 
             let workdaysMissed = 0;
 
-            // Loop dari tanggal 1 sampai (Join Date - 1)
             for (let d = 1; d < dayOfJoin; d++) {
                 const current = new Date(year, month, d);
                 const dayOfWeek = current.getDay();
-                // 0 = Minggu, 6 = Sabtu (Senin-Jumat = 1-5)
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) {
                     workdaysMissed++;
                 }
@@ -128,7 +133,41 @@
                 if (bruto <= 9650000) return 0.0175;
                 if (bruto <= 10050000) return 0.02;
                 if (bruto <= 10350000) return 0.0225;
-                return 0.03;
+                if (bruto <= 10700000) return 0.025;
+                if (bruto <= 11050000) return 0.03;
+                if (bruto <= 11600000) return 0.035;
+                if (bruto <= 12500000) return 0.04;
+                if (bruto <= 13750000) return 0.05;
+                if (bruto <= 15100000) return 0.06;
+                if (bruto <= 16950000) return 0.07;
+                if (bruto <= 19750000) return 0.08;
+                if (bruto <= 24150000) return 0.09;
+                if (bruto <= 26450000) return 0.10;
+                if (bruto <= 28000000) return 0.11;
+                if (bruto <= 30050000) return 0.12;
+                if (bruto <= 32400000) return 0.13;
+                if (bruto <= 35400000) return 0.14;
+                if (bruto <= 39100000) return 0.15;
+                if (bruto <= 43850000) return 0.16;
+                if (bruto <= 47800000) return 0.17;
+                if (bruto <= 51400000) return 0.18;
+                if (bruto <= 56300000) return 0.19;
+                if (bruto <= 62200000) return 0.20;
+                if (bruto <= 68600000) return 0.21;
+                if (bruto <= 77500000) return 0.22;
+                if (bruto <= 89000000) return 0.23;
+                if (bruto <= 103000000) return 0.24;
+                if (bruto <= 125000000) return 0.25;
+                if (bruto <= 157000000) return 0.26;
+                if (bruto <= 206000000) return 0.27;
+                if (bruto <= 337000000) return 0.28;
+                if (bruto <= 454000000) return 0.29;
+                if (bruto <= 550000000) return 0.30;
+                if (bruto <= 695000000) return 0.31;
+                if (bruto <= 910000000) return 0.32;
+                if (bruto <= 1400000000) return 0.33;
+                return 0.34;
+
             } else if (kategori === 'B') {
                 if (bruto <= 6200000) return 0;
                 if (bruto <= 6500000) return 0.0025;
@@ -136,7 +175,41 @@
                 if (bruto <= 7300000) return 0.0075;
                 if (bruto <= 9200000) return 0.01;
                 if (bruto <= 10750000) return 0.015;
-                return 0.02;
+                if (bruto <= 11250000) return 0.02;
+                if (bruto <= 11650000) return 0.025;
+                if (bruto <= 12600000) return 0.03;
+                if (bruto <= 13600000) return 0.04;
+                if (bruto <= 14950000) return 0.05;
+                if (bruto <= 16400000) return 0.06;
+                if (bruto <= 18450000) return 0.07;
+                if (bruto <= 21850000) return 0.08;
+                if (bruto <= 26000000) return 0.09;
+                if (bruto <= 28600000) return 0.10;
+                if (bruto <= 30400000) return 0.11;
+                if (bruto <= 32550000) return 0.12;
+                if (bruto <= 35100000) return 0.13;
+                if (bruto <= 38300000) return 0.14;
+                if (bruto <= 42300000) return 0.15;
+                if (bruto <= 47300000) return 0.16;
+                if (bruto <= 51700000) return 0.17;
+                if (bruto <= 55600000) return 0.18;
+                if (bruto <= 60900000) return 0.19;
+                if (bruto <= 67300000) return 0.20;
+                if (bruto <= 74200000) return 0.21;
+                if (bruto <= 83800000) return 0.22;
+                if (bruto <= 96200000) return 0.23;
+                if (bruto <= 111300000) return 0.24;
+                if (bruto <= 135100000) return 0.25;
+                if (bruto <= 169800000) return 0.26;
+                if (bruto <= 222900000) return 0.27;
+                if (bruto <= 364600000) return 0.28;
+                if (bruto <= 491200000) return 0.29;
+                if (bruto <= 595500000) return 0.30;
+                if (bruto <= 752200000) return 0.31;
+                if (bruto <= 984800000) return 0.32;
+                if (bruto <= 1515200000) return 0.33;
+                return 0.34;
+
             } else { // Kategori C
                 if (bruto <= 6600000) return 0;
                 if (bruto <= 6950000) return 0.0025;
@@ -144,15 +217,50 @@
                 if (bruto <= 7800000) return 0.0075;
                 if (bruto <= 8850000) return 0.01;
                 if (bruto <= 9800000) return 0.0125;
-                return 0.015;
+                if (bruto <= 10950000) return 0.015;
+                if (bruto <= 11450000) return 0.02;
+                if (bruto <= 11950000) return 0.025;
+                if (bruto <= 12900000) return 0.03;
+                if (bruto <= 13950000) return 0.04;
+                if (bruto <= 15350000) return 0.05;
+                if (bruto <= 16850000) return 0.06;
+                if (bruto <= 18950000) return 0.07;
+                if (bruto <= 22450000) return 0.08;
+                if (bruto <= 26700000) return 0.09;
+                if (bruto <= 29350000) return 0.10;
+                if (bruto <= 31250000) return 0.11;
+                if (bruto <= 33450000) return 0.12;
+                if (bruto <= 36050000) return 0.13;
+                if (bruto <= 39350000) return 0.14;
+                if (bruto <= 43450000) return 0.15;
+                if (bruto <= 48600000) return 0.16;
+                if (bruto <= 53100000) return 0.17;
+                if (bruto <= 57100000) return 0.18;
+                if (bruto <= 62550000) return 0.19;
+                if (bruto <= 69150000) return 0.20;
+                if (bruto <= 76250000) return 0.21;
+                if (bruto <= 86150000) return 0.22;
+                if (bruto <= 98900000) return 0.23;
+                if (bruto <= 114400000) return 0.24;
+                if (bruto <= 138850000) return 0.25;
+                if (bruto <= 174550000) return 0.26;
+                if (bruto <= 229150000) return 0.27;
+                if (bruto <= 374850000) return 0.28;
+                if (bruto <= 505050000) return 0.29;
+                if (bruto <= 612300000) return 0.30;
+                if (bruto <= 773450000) return 0.31;
+                if (bruto <= 1012600000) return 0.32;
+                if (bruto <= 1557950000) return 0.33;
+                return 0.34;
             }
         }
 
         document.getElementById('payrollForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // 1. Ambil Input
+            // 1. Ambil Input Form
             const nama = document.getElementById('nama').value;
+            const kewarganegaraan = document.getElementById('kewarganegaraan').value;
             const statusKaryawan = document.getElementById('statusKaryawan').value;
             const joinDateInput = document.getElementById('joinDate').value;
             
@@ -166,29 +274,40 @@
             const hariAbsenSebelumJoin = countWorkdaysBeforeJoin(joinDateInput);
             const hariBekerjaEfektif = Math.max(baseHariKerja - hariAbsenSebelumJoin, 0);
 
-            // Formula: ( (21 - Hari Tidak Masuk) / 21 ) * Gapok
+            // Gaji Pokok Diprorate
             const gapokDiterima = (hariBekerjaEfektif / baseHariKerja) * gapokNominal;
 
-            // Tunjangan tetap utuh
+            // Tunjangan Utuh (Tidak Diprorate)
             const tunjBensinDiterima = tunjBensin;
             const tunjKendaraanDiterima = tunjKendaraan;
 
-            // 3. Perhitungan BPJS (Mengacu pada Gapok Kontrak)
+            // 3. Perhitungan BPJS Berdasarkan Status & Kewarganegaraan
             let bpjsKesKaryawan = 0, bpjsKesYayasan = 0;
             let bpjsJhtKaryawan = 0, bpjsJpKaryawan = 0;
             let bpjsJhtYayasan = 0, bpjsJpYayasan = 0, bpjsJkkYayasan = 0, bpjsJkYayasan = 0;
 
             if (statusKaryawan === 'tetap') {
+                // BPJS Kesehatan (Semua Pekerja Tetap)
                 const capBPJSKes = Math.min(gapokNominal, 12000000);
                 bpjsKesKaryawan = capBPJSKes * 0.01;
                 bpjsKesYayasan = capBPJSKes * 0.04;
 
-                const capJP = Math.min(gapokNominal, 10042300);
+                // BPJS TK - JHT (Semua Pekerja Tetap)
                 bpjsJhtKaryawan = gapokNominal * 0.02;
-                bpjsJpKaryawan = capJP * 0.01;
-
                 bpjsJhtYayasan = gapokNominal * 0.037;
-                bpjsJpYayasan = capJP * 0.02;
+
+                // BPJS TK - JP (HANYA UNTUK WNI)
+                if (kewarganegaraan === 'WNI') {
+                    const capJP = Math.min(gapokNominal, 10042300);
+                    bpjsJpKaryawan = capJP * 0.01;
+                    bpjsJpYayasan = capJP * 0.02;
+                } else {
+                    // WNA Tidak Dipotong JP
+                    bpjsJpKaryawan = 0;
+                    bpjsJpYayasan = 0;
+                }
+
+                // JKK & JK (Diampu Yayasan)
                 bpjsJkkYayasan = gapokNominal * 0.0024;
                 bpjsJkYayasan = gapokNominal * 0.003;
             }
@@ -210,12 +329,12 @@
             const totalPotonganKaryawan = bpjsKesKaryawan + totalBpjsTkKaryawan + pph21;
             const takeHomePay = totalPenghasilanBruto - totalPotonganKaryawan;
 
-            // Format Tanggal untuk PDF
+            // Format Tanggal Indonesia
             const formattedJoinDate = new Date(joinDateInput).toLocaleDateString('id-ID', {
                 day: 'numeric', month: 'long', year: 'numeric'
             });
 
-            // 6. Generate PDF
+            // 6. Generate PDF via jsPDF
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
@@ -230,21 +349,24 @@
 
             // Detail Karyawan
             doc.setFontSize(9);
-            doc.text(`Nama Karyawan  : ${nama}`, 14, 30);
+            doc.text(`Nama Karyawan  : ${nama} (${kewarganegaraan})`, 14, 30);
             doc.text(`Status Karyawan: ${statusKaryawan === 'tetap' ? 'Pekerja Tetap' : 'Pekerja Tidak Tetap'}`, 14, 35);
             doc.text(`Tanggal Masuk  : ${formattedJoinDate}`, 14, 40);
             
             doc.text(`Kategori PTKP  : Kategori ${statusPajak}`, 125, 30);
             doc.text(`Prorate Base   : ${hariBekerjaEfektif} / 21 Hari (Pengurang: ${hariAbsenSebelumJoin} Hari)`, 125, 35);
 
-            // Tabel Penerimaan & Potongan Karyawan
+            // Label JP pada PDF menyesuaikan WNI/WNA
+            const labelJP = kewarganegaraan === 'WNA' ? 'BPJS TK - JP (Exempt WNA)' : 'BPJS TK - JP (1%)';
+
+            // Tabel Penerimaan & Potongan
             doc.autoTable({
                 startY: 45,
                 head: [['Penerimaan', 'Jumlah (Rp)', 'Potongan Karyawan', 'Jumlah (Rp)']],
                 body: [
                     ['Gaji Pokok (Prorate)', Math.round(gapokDiterima).toLocaleString('id-ID'), 'BPJS Kesehatan (1%)', Math.round(bpjsKesKaryawan).toLocaleString('id-ID')],
                     ['Tunjangan Bensin', Math.round(tunjBensinDiterima).toLocaleString('id-ID'), 'BPJS TK - JHT (2%)', Math.round(bpjsJhtKaryawan).toLocaleString('id-ID')],
-                    ['Tunjangan Kendaraan', Math.round(tunjKendaraanDiterima).toLocaleString('id-ID'), 'BPJS TK - JP (1%)', Math.round(bpjsJpKaryawan).toLocaleString('id-ID')],
+                    ['Tunjangan Kendaraan', Math.round(tunjKendaraanDiterima).toLocaleString('id-ID'), labelJP, Math.round(bpjsJpKaryawan).toLocaleString('id-ID')],
                     ['', '', 'PPh 21', Math.round(pph21).toLocaleString('id-ID')],
                 ],
                 foot: [[
@@ -266,7 +388,7 @@
                 body: [
                     ['BPJS Kesehatan (Porsi Yayasan)', '4%', Math.round(bpjsKesYayasan).toLocaleString('id-ID')],
                     ['BPJS TK - JHT (Jaminan Hari Tua)', '3.7%', Math.round(bpjsJhtYayasan).toLocaleString('id-ID')],
-                    ['BPJS TK - JP (Jaminan Pensiun)', '2%', Math.round(bpjsJpYayasan).toLocaleString('id-ID')],
+                    ['BPJS TK - JP (Jaminan Pensiun)', kewarganegaraan === 'WNA' ? '0% (WNA)' : '2%', Math.round(bpjsJpYayasan).toLocaleString('id-ID')],
                     ['BPJS TK - JKK (Jaminan Kecelakaan Kerja)', '0.24%', Math.round(bpjsJkkYayasan).toLocaleString('id-ID')],
                     ['BPJS TK - JK (Jaminan Kematian)', '0.3%', Math.round(bpjsJkYayasan).toLocaleString('id-ID')],
                 ],
