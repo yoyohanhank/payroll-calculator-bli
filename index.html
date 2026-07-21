@@ -125,13 +125,13 @@
             return workdaysMissed;
         }
 
-        // Kalkulasi PPh 21 Presisi Konsultan Pajak
-        function hitungPPh21Pasal17(brutoBulananPajak, iuranJhtKaryawan, iuranJpKaryawan, iuranKesKaryawan, nominalPTKP) {
+        // Kalkulasi PPh 21 Metode Konsultan Pajak
+        function hitungPPh21Konsultan(brutoBulananPajak, nominalPTKP) {
             // 1. Biaya Jabatan (5% dari Bruto Pajak, maks Rp 500.000/bulan)
             const biayaJabatan = Math.min(brutoBulananPajak * 0.05, 500000);
 
-            // 2. Penghasilan Neto Bulanan (Memperhitungkan pengurang BPJS Kes + BPJS TK Karyawan)
-            const netoBulanan = brutoBulananPajak - biayaJabatan - iuranJhtKaryawan - iuranJpKaryawan - iuranKesKaryawan;
+            // 2. Penghasilan Neto Bulanan
+            const netoBulanan = brutoBulananPajak - biayaJabatan;
 
             // 3. Penghasilan Neto Setahun
             const netoSetahun = netoBulanan * 12;
@@ -212,12 +212,10 @@
             let bpjsJhtYayasan = 0, bpjsJpYayasan = 0, bpjsJkkYayasan = 0, bpjsJkYayasan = 0;
 
             if (statusKaryawan === 'tetap') {
-                // BPJS Kesehatan (Porsi Karyawan menggunakan Cap Rp12.000.000)
+                // BPJS Kesehatan (Cap Rp12.000.000)
                 const capBPJSKes = Math.min(gapokNominal, 12000000);
-                bpjsKesKaryawan = capBPJSKes * 0.01;
-                
-                // BPJS Kesehatan Porsi Yayasan untuk Pajak (Uncapped, 4% penuh sesuai konsultan)
-                bpjsKesYayasan = gapokNominal * 0.04;
+                bpjsKesKaryawan = capBPJSKes * 0.01; // Rp 120.000
+                bpjsKesYayasan = capBPJSKes * 0.04;  // Rp 480.000 (Sesuai Konsultan)
 
                 // BPJS TK - JHT (2% Karyawan, 3.7% Yayasan)
                 bpjsJhtKaryawan = gapokNominal * 0.02;
@@ -249,7 +247,7 @@
 
             let pph21 = 0;
             if (statusKaryawan === 'tetap') {
-                pph21 = hitungPPh21Pasal17(brutoPajak, bpjsJhtKaryawan, bpjsJpKaryawan, bpjsKesKaryawan, nominalPTKP);
+                pph21 = hitungPPh21Konsultan(brutoPajak, nominalPTKP);
             } else {
                 pph21 = (brutoKas * 0.5) * 0.05;
             }
