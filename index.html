@@ -125,13 +125,13 @@
             return workdaysMissed;
         }
 
-        // Kalkulasi PPh 21 Metode Pasal 17 UU PPh (Metode Konsultan Pajak)
-        function hitungPPh21Pasal17(brutoBulananPajak, iuranJhtKaryawan, iuranJpKaryawan, nominalPTKP) {
+        // Kalkulasi PPh 21 Presisi Konsultan Pajak
+        function hitungPPh21Pasal17(brutoBulananPajak, iuranJhtKaryawan, iuranJpKaryawan, iuranKesKaryawan, nominalPTKP) {
             // 1. Biaya Jabatan (5% dari Bruto Pajak, maks Rp 500.000/bulan)
             const biayaJabatan = Math.min(brutoBulananPajak * 0.05, 500000);
 
-            // 2. Penghasilan Neto Bulanan
-            const netoBulanan = brutoBulananPajak - biayaJabatan - iuranJhtKaryawan - iuranJpKaryawan;
+            // 2. Penghasilan Neto Bulanan (Memperhitungkan pengurang BPJS Kes + BPJS TK Karyawan)
+            const netoBulanan = brutoBulananPajak - biayaJabatan - iuranJhtKaryawan - iuranJpKaryawan - iuranKesKaryawan;
 
             // 3. Penghasilan Neto Setahun
             const netoSetahun = netoBulanan * 12;
@@ -249,7 +249,7 @@
 
             let pph21 = 0;
             if (statusKaryawan === 'tetap') {
-                pph21 = hitungPPh21Pasal17(brutoPajak, bpjsJhtKaryawan, bpjsJpKaryawan, nominalPTKP);
+                pph21 = hitungPPh21Pasal17(brutoPajak, bpjsJhtKaryawan, bpjsJpKaryawan, bpjsKesKaryawan, nominalPTKP);
             } else {
                 pph21 = (brutoKas * 0.5) * 0.05;
             }
