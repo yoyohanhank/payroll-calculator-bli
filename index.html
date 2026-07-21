@@ -125,7 +125,7 @@
             return workdaysMissed;
         }
 
-        // Kalkulasi PPh 21 Metode Pasal 17 UU PPh (Disetahunkan - Konsultan Pajak Method)
+        // Kalkulasi PPh 21 Metode Pasal 17 UU PPh (Metode Konsultan Pajak)
         function hitungPPh21Pasal17(brutoBulananPajak, iuranJhtKaryawan, iuranJpKaryawan, nominalPTKP) {
             // 1. Biaya Jabatan (5% dari Bruto Pajak, maks Rp 500.000/bulan)
             const biayaJabatan = Math.min(brutoBulananPajak * 0.05, 500000);
@@ -136,12 +136,9 @@
             // 3. Penghasilan Neto Setahun
             const netoSetahun = netoBulanan * 12;
 
-            // 4. Penghasilan Kena Pajak (PKP) Setahun
-            let pkpSetahun = netoSetahun - nominalPTKP;
+            // 4. Penghasilan Kena Pajak (PKP) Setahun (dibulatkan ke ribuan bawah)
+            let pkpSetahun = Math.floor((netoSetahun - nominalPTKP) / 1000) * 1000;
             if (pkpSetahun <= 0) return 0;
-
-            // Pembulatan ke bawah per ribuan penuh
-            pkpSetahun = Math.floor(pkpSetahun / 1000) * 1000;
 
             // 5. Perhitungan Pajak Progresif Pasal 17
             let pajakSetahun = 0;
@@ -215,12 +212,14 @@
             let bpjsJhtYayasan = 0, bpjsJpYayasan = 0, bpjsJkkYayasan = 0, bpjsJkYayasan = 0;
 
             if (statusKaryawan === 'tetap') {
-                // BPJS Kesehatan (Cap Rp 12.000.000)
+                // BPJS Kesehatan (Porsi Karyawan menggunakan Cap Rp12.000.000)
                 const capBPJSKes = Math.min(gapokNominal, 12000000);
                 bpjsKesKaryawan = capBPJSKes * 0.01;
-                bpjsKesYayasan = capBPJSKes * 0.04;
+                
+                // BPJS Kesehatan Porsi Yayasan untuk Pajak (Uncapped, 4% penuh sesuai konsultan)
+                bpjsKesYayasan = gapokNominal * 0.04;
 
-                // BPJS TK - JHT
+                // BPJS TK - JHT (2% Karyawan, 3.7% Yayasan)
                 bpjsJhtKaryawan = gapokNominal * 0.02;
                 bpjsJhtYayasan = gapokNominal * 0.037;
 
@@ -234,17 +233,17 @@
                     bpjsJpYayasan = 0;
                 }
 
-                // JKK & JK (Diampu Yayasan)
+                // JKK (0.24%) & JK (0.30%) Porsi Yayasan
                 bpjsJkkYayasan = gapokNominal * 0.0024;
-                bpjsJkYayasan = gapokNominal * 0.03; // 0.3%
+                bpjsJkYayasan = gapokNominal * 0.003;
             }
 
             const totalBpjsTkKaryawan = bpjsJhtKaryawan + bpjsJpKaryawan;
 
-            // 4. Perhitungan Penghasilan Bruto & PPh 21 (Pasal 17 Disetahunkan)
+            // 4. Perhitungan Penghasilan Bruto & PPh 21 (Metode Konsultan)
             const brutoKas = gapokDiterima + tunjBensinDiterima + tunjKendaraanDiterima;
             
-            // Tunjangan BPJS Porsi Yayasan yang Menjadi Objek Pajak (BPJS Kes 4%, JKK 0.24%, JK 0.3%)
+            // Tunjangan BPJS Porsi Yayasan yang Menjadi Tambahan Objek Pajak
             const bpjsYayasanObjekPajak = bpjsKesYayasan + bpjsJkkYayasan + bpjsJkYayasan;
             const brutoPajak = brutoKas + bpjsYayasanObjekPajak;
 
