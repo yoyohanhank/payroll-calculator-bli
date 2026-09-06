@@ -3,345 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payroll System - Yayasan Black Licorice Indonesia</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- jsPDF & AutoTable CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <title>Verifikasi Kehadiran & Lokasi</title>
+    <style>
+        :root {
+            --primary: #25D366;
+            --dark: #075E54;
+            --bg: #f0f2f5;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h2 {
+            color: var(--dark);
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+        p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video, canvas, img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        canvas, img {
+            display: none;
+        }
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:active {
+            opacity: 0.9;
+        }
+        .btn-secondary {
+            background-color: #e4e6eb;
+            color: #333;
+            margin-top: 8px;
+        }
+        #status {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 12px;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 p-6 font-sans">
+<body>
 
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-md border border-slate-200">
-        <h1 class="text-2xl font-bold text-slate-800 mb-1">Payroll System</h1>
-        <p class="text-slate-500 font-medium mb-6">Yayasan Black Licorice Indonesia</p>
+    <div class="card">
+        <h2>Verifikasi Data Debitur</h2>
+        <p>Silakan lengkapi nama dan ambil foto kondisi terkini untuk konfirmasi lokasi.</p>
 
-        <form id="payrollForm" class="space-y-4">
-            <!-- Informasi Karyawan & Kewarganegaraan -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Karyawan</label>
-                    <input type="text" id="nama" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Kewarganegaraan</label>
-                    <select id="kewarganegaraan" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="WNI">WNI (Warga Negara Indonesia)</option>
-                        <option value="WNA">WNA (Warga Negara Asing)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Status Karyawan</label>
-                    <select id="statusKaryawan" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                        <option value="tetap">Pekerja Tetap (PKWT / PKWTT)</option>
-                        <option value="tidak_tetap">Pekerja Tidak Tetap (Konsultan / Freelance)</option>
-                    </select>
-                </div>
+        <div class="form-group">
+            <label for="nama">Nama Lengkap</label>
+            <input type="text" id="nama" placeholder="Masukkan nama Anda..." required>
+        </div>
+
+        <div class="form-group">
+            <label>Ambil Foto Bukti</label>
+            <div class="camera-container" id="camBox">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <img id="photoPreview" alt="Hasil Foto">
             </div>
+            <button type="button" class="btn btn-secondary" id="btnSnap">Ambil Foto</button>
+            <button type="button" class="btn btn-secondary" id="btnRetake" style="display:none;">Ulangi Foto</button>
+        </div>
 
-            <!-- Tanggal Masuk (Join Date) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal Masuk (Join Date)</label>
-                    <input type="date" id="joinDate" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Base Hari Kerja</label>
-                    <input type="text" value="21 Hari Kerja (Fixed)" disabled class="w-full border bg-slate-100 text-slate-500 rounded-lg p-2.5 text-sm cursor-not-allowed">
-                </div>
-            </div>
-
-            <!-- Penghasilan dengan Real-Time Format Ribuan -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Gaji Pokok (Rp)</label>
-                    <input type="text" id="gajiPokok" required placeholder="0" class="currency-input w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tunjangan Bensin (Rp)</label>
-                    <input type="text" id="tunjBensin" placeholder="0" class="currency-input w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tunjangan Kendaraan (Rp)</label>
-                    <input type="text" id="tunjKendaraan" placeholder="0" class="currency-input w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-            </div>
-
-            <!-- Status Pajak PTKP Detail -->
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Status PTKP (Pajak)</label>
-                <select id="ptkpSelect" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                    <option value="54000000">TK/0 - Tidak Kawin (Rp 54.000.000)</option>
-                    <option value="58500000">TK/1 - Tidak Kawin, 1 Tanggungan (Rp 58.500.000)</option>
-                    <option value="63000000">TK/2 - Tidak Kawin, 2 Tanggungan (Rp 63.000.000)</option>
-                    <option value="67500000">TK/3 - Tidak Kawin, 3 Tanggungan (Rp 67.500.000)</option>
-                    <option value="58500000_K">K/0 - Kawin, 0 Tanggungan (Rp 58.500.000)</option>
-                    <option value="63000000_K">K/1 - Kawin, 1 Tanggungan (Rp 63.000.000)</option>
-                    <option value="67500000_K">K/2 - Kawin, 2 Tanggungan (Rp 67.500.000)</option>
-                    <option value="72000000">K/3 - Kawin, 3 Tanggungan (Rp 72.000.000)</option>
-                </select>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition duration-200 mt-6">
-                Hitung & Cetak Slip Gaji (PDF)
-            </button>
-        </form>
+        <button type="button" class="btn" id="btnSend" disabled>Kirim via WhatsApp</button>
+        <div id="status">Mendeteksi lokasi GPS...</div>
     </div>
 
     <script>
-        // Helper: Format Input Angka secara Real-time
-        document.querySelectorAll('.currency-input').forEach(input => {
-            input.addEventListener('input', function(e) {
-                let value = this.value.replace(/\D/g, '');
-                if (value) {
-                    this.value = parseInt(value, 10).toLocaleString('id-ID');
-                } else {
-                    this.value = '';
-                }
-            });
+        // Konfigurasi Nomor WhatsApp Tujuan (Ganti dengan nomor Anda, format internasional tanpa tanda + atau 0 di depan, misal: 628123456789)
+        const NOMOR_WHATSAPP_TUJUAN = "628123456789"; 
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photoPreview = document.getElementById('photoPreview');
+        const btnSnap = document.getElementById('btnSnap');
+        const btnRetake = document.getElementById('btnRetake');
+        const btnSend = document.getElementById('btnSend');
+        const inputNama = document.getElementById('nama');
+        const statusDiv = document.getElementById('status');
+
+        let latitude = null;
+        let longitude = null;
+        let stream = null;
+        let isPhotoTaken = false;
+
+        // 1. Inisialisasi Kamera
+        async function initCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                video.srcObject = stream;
+            } catch (err) {
+                alert("Gagal mengakses kamera. Pastikan memberikan izin akses kamera pada browser.");
+                statusDiv.innerText = "Kamera tidak diizinkan.";
+            }
+        }
+
+        // 2. Ambil Koordinat GPS
+        function initGPS() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        latitude = position.coords.latitude;
+                        longitude = position.coords.longitude;
+                        statusDiv.innerText = "Lokasi GPS berhasil dikunci.";
+                    },
+                    (error) => {
+                        alert("Gagal mendeteksi lokasi. Pastikan GPS/Lokasi HP Anda Aktif.");
+                        statusDiv.innerText = "GPS gagal diakses.";
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                statusDiv.innerText = "Browser tidak mendukung Geolocation.";
+            }
+        }
+
+        // Jalankan saat halaman dibuka
+        initCamera();
+        initGPS();
+
+        // Tombol Ambil Foto
+        btnSnap.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const dataURL = canvas.toDataURL('image/jpeg');
+            photoPreview.src = dataURL;
+            photoPreview.style.display = 'block';
+            video.style.display = 'none';
+
+            // Matikan stream kamera setelah foto diambil
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            btnSnap.style.display = 'none';
+            btnRetake.style.display = 'block';
+            isPhotoTaken = true;
+            validateForm();
         });
 
-        function parseNominal(valueStr) {
-            if (!valueStr) return 0;
-            return parseFloat(valueStr.replace(/\./g, '')) || 0;
-        }
+        // Tombol Ulangi Foto
+        btnRetake.addEventListener('click', () => {
+            photoPreview.style.display = 'none';
+            video.style.display = 'block';
+            btnSnap.style.display = 'block';
+            btnRetake.style.display = 'none';
+            isPhotoTaken = false;
+            initCamera();
+            validateForm();
+        });
 
-        // Menghitung Hari Kerja (Senin-Jumat) dari Tgl 1 s.d. sebelum Join Date
-        function countWorkdaysBeforeJoin(joinDateStr) {
-            const joinDate = new Date(joinDateStr);
-            const year = joinDate.getFullYear();
-            const month = joinDate.getMonth();
-            const dayOfJoin = joinDate.getDate();
+        inputNama.addEventListener('input', validateForm);
 
-            let workdaysMissed = 0;
-
-            for (let d = 1; d < dayOfJoin; d++) {
-                const current = new Date(year, month, d);
-                const dayOfWeek = current.getDay();
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                    workdaysMissed++;
-                }
-            }
-            return workdaysMissed;
-        }
-
-        // Kalkulasi PPh 21 Metode Konsultan Pajak
-        function hitungPPh21Konsultan(brutoBulananPajak, nominalPTKP) {
-            // 1. Biaya Jabatan (5% dari Bruto Pajak, maks Rp 500.000/bulan)
-            const biayaJabatan = Math.min(brutoBulananPajak * 0.05, 500000);
-
-            // 2. Penghasilan Neto Bulanan
-            const netoBulanan = brutoBulananPajak - biayaJabatan;
-
-            // 3. Penghasilan Neto Setahun
-            const netoSetahun = netoBulanan * 12;
-
-            // 4. Penghasilan Kena Pajak (PKP) Setahun (dibulatkan ke ribuan bawah)
-            let pkpSetahun = Math.floor((netoSetahun - nominalPTKP) / 1000) * 1000;
-            if (pkpSetahun <= 0) return 0;
-
-            // 5. Perhitungan Pajak Progresif Pasal 17
-            let pajakSetahun = 0;
-            let sisaPKP = pkpSetahun;
-
-            // Lapis 1: 5% (0 - 60 Juta)
-            if (sisaPKP > 0) {
-                const layer1 = Math.min(sisaPKP, 60000000);
-                pajakSetahun += layer1 * 0.05;
-                sisaPKP -= layer1;
-            }
-            // Lapis 2: 15% (60 Juta - 250 Juta)
-            if (sisaPKP > 0) {
-                const layer2 = Math.min(sisaPKP, 190000000);
-                pajakSetahun += layer2 * 0.15;
-                sisaPKP -= layer2;
-            }
-            // Lapis 3: 25% (250 Juta - 500 Juta)
-            if (sisaPKP > 0) {
-                const layer3 = Math.min(sisaPKP, 250000000);
-                pajakSetahun += layer3 * 0.25;
-                sisaPKP -= layer3;
-            }
-            // Lapis 4: 30% (500 Juta - 5 Miliar)
-            if (sisaPKP > 0) {
-                const layer4 = Math.min(sisaPKP, 4500000000);
-                pajakSetahun += layer4 * 0.30;
-                sisaPKP -= layer4;
-            }
-            // Lapis 5: 35% (Di atas 5 Miliar)
-            if (sisaPKP > 0) {
-                pajakSetahun += sisaPKP * 0.35;
-            }
-
-            // 6. PPh 21 Bulanan
-            return pajakSetahun / 12;
-        }
-
-        document.getElementById('payrollForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // 1. Ambil Input Form
-            const nama = document.getElementById('nama').value;
-            const kewarganegaraan = document.getElementById('kewarganegaraan').value;
-            const statusKaryawan = document.getElementById('statusKaryawan').value;
-            const joinDateInput = document.getElementById('joinDate').value;
-            
-            const gapokNominal = parseNominal(document.getElementById('gajiPokok').value);
-            const tunjBensin = parseNominal(document.getElementById('tunjBensin').value); 
-            const tunjKendaraan = parseNominal(document.getElementById('tunjKendaraan').value); 
-            
-            const ptkpValueRaw = document.getElementById('ptkpSelect').value;
-            const nominalPTKP = parseFloat(ptkpValueRaw.replace('_K', ''));
-            const textPTKP = document.getElementById('ptkpSelect').options[document.getElementById('ptkpSelect').selectedIndex].text.split(' - ')[0];
-
-            // 2. Kalkulasi Prorate Berdasarkan Join Date
-            const baseHariKerja = 21;
-            const hariAbsenSebelumJoin = countWorkdaysBeforeJoin(joinDateInput);
-            const hariBekerjaEfektif = Math.max(baseHariKerja - hariAbsenSebelumJoin, 0);
-
-            // Gaji Pokok Diprorate
-            const gapokDiterima = (hariBekerjaEfektif / baseHariKerja) * gapokNominal;
-
-            // Tunjangan Utuh (Tidak Diprorate)
-            const tunjBensinDiterima = tunjBensin;
-            const tunjKendaraanDiterima = tunjKendaraan;
-
-            // 3. Perhitungan BPJS Berdasarkan Status & Kewarganegaraan
-            let bpjsKesKaryawan = 0, bpjsKesYayasan = 0;
-            let bpjsJhtKaryawan = 0, bpjsJpKaryawan = 0;
-            let bpjsJhtYayasan = 0, bpjsJpYayasan = 0, bpjsJkkYayasan = 0, bpjsJkYayasan = 0;
-
-            if (statusKaryawan === 'tetap') {
-                // BPJS Kesehatan (Cap Rp12.000.000)
-                const capBPJSKes = Math.min(gapokNominal, 12000000);
-                bpjsKesKaryawan = capBPJSKes * 0.01; // Rp 120.000
-                bpjsKesYayasan = capBPJSKes * 0.04;  // Rp 480.000 (Sesuai Konsultan)
-
-                // BPJS TK - JHT (2% Karyawan, 3.7% Yayasan)
-                bpjsJhtKaryawan = gapokNominal * 0.02;
-                bpjsJhtYayasan = gapokNominal * 0.037;
-
-                // BPJS TK - JP (HANYA UNTUK WNI, Cap Rp 10.042.300)
-                if (kewarganegaraan === 'WNI') {
-                    const capJP = Math.min(gapokNominal, 10042300);
-                    bpjsJpKaryawan = capJP * 0.01;
-                    bpjsJpYayasan = capJP * 0.02;
-                } else {
-                    bpjsJpKaryawan = 0;
-                    bpjsJpYayasan = 0;
-                }
-
-                // JKK (0.24%) & JK (0.30%) Porsi Yayasan
-                bpjsJkkYayasan = gapokNominal * 0.0024;
-                bpjsJkYayasan = gapokNominal * 0.003;
-            }
-
-            const totalBpjsTkKaryawan = bpjsJhtKaryawan + bpjsJpKaryawan;
-
-            // 4. Perhitungan Penghasilan Bruto & PPh 21 (Metode Konsultan)
-            const brutoKas = gapokDiterima + tunjBensinDiterima + tunjKendaraanDiterima;
-            
-            // Tunjangan BPJS Porsi Yayasan yang Menjadi Tambahan Objek Pajak
-            const bpjsYayasanObjekPajak = bpjsKesYayasan + bpjsJkkYayasan + bpjsJkYayasan;
-            const brutoPajak = brutoKas + bpjsYayasanObjekPajak;
-
-            let pph21 = 0;
-            if (statusKaryawan === 'tetap') {
-                pph21 = hitungPPh21Konsultan(brutoPajak, nominalPTKP);
+        function validateForm() {
+            if (inputNama.value.trim() !== "" && isPhotoTaken && latitude !== null) {
+                btnSend.removeAttribute('disabled');
             } else {
-                pph21 = (brutoKas * 0.5) * 0.05;
+                btnSend.setAttribute('disabled', 'true');
             }
+        }
 
-            // 5. Take Home Pay (THP)
-            const totalPotonganKaryawan = bpjsKesKaryawan + totalBpjsTkKaryawan + pph21;
-            const takeHomePay = brutoKas - totalPotonganKaryawan;
-
-            // Format Tanggal Indonesia
-            const formattedJoinDate = new Date(joinDateInput).toLocaleDateString('id-ID', {
-                day: 'numeric', month: 'long', year: 'numeric'
-            });
-
-            // 6. Generate PDF via jsPDF
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Header PDF
-            doc.setFontSize(15);
-            doc.setFont("helvetica", "bold");
-            doc.text("YAYASAN BLACK LICORICE INDONESIA", 105, 15, { align: "center" });
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "normal");
-            doc.text("SLIP GAJI KARYAWAN", 105, 21, { align: "center" });
-            doc.line(14, 24, 196, 24);
-
-            // Detail Karyawan
-            doc.setFontSize(9);
-            doc.text(`Nama Karyawan  : ${nama} (${kewarganegaraan})`, 14, 30);
-            doc.text(`Status Karyawan: ${statusKaryawan === 'tetap' ? 'Pekerja Tetap' : 'Pekerja Tidak Tetap'}`, 14, 35);
-            doc.text(`Tanggal Masuk  : ${formattedJoinDate}`, 14, 40);
+        // Tombol Kirim ke WhatsApp
+        btnSend.addEventListener('click', () => {
+            const nama = inputNama.value.trim();
+            const gmapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
             
-            doc.text(`Status PTKP    : ${textPTKP}`, 125, 30);
-            doc.text(`Metode Pajak   : Pasal 17 Disetahunkan`, 125, 35);
-            doc.text(`Prorate Base   : ${hariBekerjaEfektif} / 21 Hari (Pengurang: ${hariAbsenSebelumJoin} Hari)`, 125, 40);
+            const textPesan = `Halo, berikut data verifikasi saya:%0A` +
+                              `*Nama:* ${nama}%0A` +
+                              `*Lokasi Terkini (Gmaps):* ${gmapsLink}`;
 
-            // Label JP pada PDF menyesuaikan WNI/WNA
-            const labelJP = kewarganegaraan === 'WNA' ? 'BPJS TK - JP (Exempt WNA)' : 'BPJS TK - JP (1%)';
-
-            // Tabel Penerimaan & Potongan
-            doc.autoTable({
-                startY: 45,
-                head: [['Penerimaan', 'Jumlah (Rp)', 'Potongan Karyawan', 'Jumlah (Rp)']],
-                body: [
-                    ['Gaji Pokok (Prorate)', Math.round(gapokDiterima).toLocaleString('id-ID'), 'BPJS Kesehatan (1%)', Math.round(bpjsKesKaryawan).toLocaleString('id-ID')],
-                    ['Tunjangan Bensin', Math.round(tunjBensinDiterima).toLocaleString('id-ID'), 'BPJS TK - JHT (2%)', Math.round(bpjsJhtKaryawan).toLocaleString('id-ID')],
-                    ['Tunjangan Kendaraan', Math.round(tunjKendaraanDiterima).toLocaleString('id-ID'), labelJP, Math.round(bpjsJpKaryawan).toLocaleString('id-ID')],
-                    ['', '', 'PPh 21 (Pasal 17)', Math.round(pph21).toLocaleString('id-ID')],
-                ],
-                foot: [[
-                    'Total Bruto Kas', Math.round(brutoKas).toLocaleString('id-ID'),
-                    'Total Potongan', Math.round(totalPotonganKaryawan).toLocaleString('id-ID')
-                ]],
-                theme: 'striped',
-                headStyles: { fillColor: [41, 128, 185] }
-            });
-
-            // Tabel Benefit BPJS Porsi Yayasan
-            const finalY = doc.lastAutoTable.finalY + 6;
-            doc.setFont("helvetica", "bold");
-            doc.text("Tanggungan / Benefit BPJS Porsi Yayasan (Tidak Memotong Gaji)", 14, finalY);
-
-            doc.autoTable({
-                startY: finalY + 3,
-                head: [['Komponen Benefit Yayasan', 'Persentase', 'Jumlah Tanggungan (Rp)']],
-                body: [
-                    ['BPJS Kesehatan (Porsi Yayasan)', '4%', Math.round(bpjsKesYayasan).toLocaleString('id-ID')],
-                    ['BPJS TK - JHT (Jaminan Hari Tua)', '3.7%', Math.round(bpjsJhtYayasan).toLocaleString('id-ID')],
-                    ['BPJS TK - JP (Jaminan Pensiun)', kewarganegaraan === 'WNA' ? '0% (WNA)' : '2%', Math.round(bpjsJpYayasan).toLocaleString('id-ID')],
-                    ['BPJS TK - JKK (Jaminan Kecelakaan Kerja)', '0.24%', Math.round(bpjsJkkYayasan).toLocaleString('id-ID')],
-                    ['BPJS TK - JK (Jaminan Kematian)', '0.3%', Math.round(bpjsJkYayasan).toLocaleString('id-ID')],
-                ],
-                theme: 'plain',
-                styles: { fontSize: 8 }
-            });
-
-            // Highlight Take Home Pay
-            const thpY = doc.lastAutoTable.finalY + 8;
-            doc.setFillColor(235, 248, 255);
-            doc.rect(14, thpY, 182, 11, 'F');
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(0, 51, 102);
-            doc.text(`TAKE HOME PAY (THP):  Rp ${Math.round(takeHomePay).toLocaleString('id-ID')}`, 18, thpY + 7);
-
-            // Footer Tanda Tangan
-            doc.setFontSize(8);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(0, 0, 0);
-            doc.text("Disetujui Oleh,", 150, thpY + 20);
-            doc.text("Yayasan Black Licorice Indonesia", 130, thpY + 38);
-
-            // Save PDF
-            doc.save(`Slip_Gaji_${nama.replace(/\s+/g, '_')}.pdf`);
+            const waURL = `https://wa.me/${NOMOR_WHATSAPP_TUJUAN}?text=${textPesan}`;
+            window.location.href = waURL;
         });
     </script>
 </body>
